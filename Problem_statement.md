@@ -6,10 +6,12 @@ Food Ordering & Delivery Platform
 
 Full Stack Web Development / E-Commerce / Food Delivery
 
-3. Who is the user? (2–3 user types, with roles)
+3. Who is the user? 
+
 Customer – Browse restaurants, order food, and track orders.
 Restaurant Owner – Manage menu items and receive customer orders.
 Admin – Manage users, restaurants, and monitor the system.
+
 4. What problem are we solving?
 
 Many people find it difficult to order food quickly from nearby restaurants. Traditional phone ordering is slow and may cause mistakes. This application allows customers to browse menus, place orders online, make payments, and track deliveries easily. It saves time and improves the ordering experience.
@@ -26,7 +28,9 @@ Online payment
 Order tracking
 Order history
 Admin dashboard for management
-6. Core Entities / Database Tables (Minimum 5)
+
+6. Core Entities / Database 
+
 Users
 Restaurants
 Menu
@@ -34,6 +38,7 @@ Orders
 Order_Items
 Payments
 Delivery
+
 7. User Roles & Permissions
 
 Admin
@@ -48,17 +53,24 @@ Register/Login
 Place orders
 Track orders
 View order history
+
+
 8. Success Criteria
+
 Users should be able to register and log in successfully.
 Customers should be able to place a food order in less than 2 minutes.
 Orders should be stored correctly in the database.
 Customers should be able to track their order status.
+
 9. Out of Scope
+
 Drone delivery
 Voice ordering
 AI-based food recommendations
 Offline payment collection
 International delivery
+
+
 10. Chosen Track
 
 Python (Django)
