@@ -16,16 +16,16 @@ Database Management – Stores customer, restaurant, menu, order, payment, and d
 
 Current Status: In Progress
 
-✅ Project topic finalized
-✅ Requirement analysis completed
-✅ ER Diagram completed
-✅ Database entities and relationships identified
-🔄 Database implementation – In Progress
-🔄 Backend development – In Progress
-⏳ Frontend development – Pending
-⏳ Payment integration – Pending
-⏳ Delivery tracking – Pending
-⏳ Testing and deployment – Pending
+ Project topic finalized
+ Requirement analysis completed
+ ER Diagram completed
+ Database entities and relationships identified
+ Database implementation – In Progress
+ Backend development – In Progress
+ Frontend development – Pending
+ Payment integration – Pending
+ Delivery tracking – Pending
+ Testing and deployment – Pending
 
 Overall Status: The basic design and database structure of the Food Ordering and Delivery Platform have been completed, and the project is currently moving towards implementation and development.1. Introduction
 
@@ -45,15 +45,15 @@ Database Management – Stores customer, restaurant, menu, order, payment, and d
 
 Current Status: In Progress
 
-✅ Project topic finalized
-✅ Requirement analysis completed
-✅ ER Diagram completed
-✅ Database entities and relationships identified
-🔄 Database implementation – In Progress
-🔄 Backend development – In Progress
-⏳ Frontend development – Pending
-⏳ Payment integration – Pending
-⏳ Delivery tracking – Pending
-⏳ Testing and deployment – Pending
+ Project topic finalized
+ Requirement analysis completed
+ ER Diagram completed
+ Database entities and relationships identified
+ Database implementation – In Progress
+ Backend development – In Progress
+ Frontend development – Pending
+ Payment integration – Pending
+ Delivery tracking – Pending
+ Testing and deployment – Pending
 
 Overall Status: The basic design and database structure of the Food Ordering and Delivery Platform have been completed, and the project is currently moving towards implementation and development.
