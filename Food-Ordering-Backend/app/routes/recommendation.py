@@ -1,22 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.database import get_db
-from app.models import (
-    Recommendation,
-    Customer,
-    Menu,
-    Order,
-    OrderItem
-)
+from app.models import Recommendation, Customer, Menu, Order, OrderItem
 
 router = APIRouter(
     prefix="/recommendations",
     tags=["Recommendations"]
 )
 
-
-# ---------------- CREATE RECOMMENDATION ----------------
 
 @router.post("/")
 def create_recommendation(
@@ -25,7 +18,6 @@ def create_recommendation(
     score: int,
     db: Session = Depends(get_db)
 ):
-
     customer = db.query(Customer).filter(
         Customer.customer_id == customer_id
     ).first()
@@ -65,15 +57,12 @@ def create_recommendation(
     }
 
 
-# ---------------- GET RECOMMENDATIONS ----------------
-
 @router.get("/{customer_id}")
 def get_recommendations(
     customer_id: int,
     db: Session = Depends(get_db)
 ):
 
-    # Get customer's previous orders
     previous_orders = (
         db.query(OrderItem)
         .join(
@@ -89,13 +78,11 @@ def get_recommendations(
     if not previous_orders:
         return []
 
-    # Get menu IDs already ordered
     ordered_menu_ids = [
         item.menu_id
         for item in previous_orders
     ]
 
-    # Get previous menu items
     previous_menus = (
         db.query(Menu)
         .filter(
@@ -107,9 +94,8 @@ def get_recommendations(
     if not previous_menus:
         return []
 
-    # Take category from previous food
     categories = [
-        menu.category
+        menu.category.lower()
         for menu in previous_menus
         if menu.category
     ]
@@ -117,11 +103,10 @@ def get_recommendations(
     if not categories:
         return []
 
-    # Find other foods from same category
     recommended_menus = (
         db.query(Menu)
         .filter(
-            Menu.category.in_(categories),
+            func.lower(Menu.category).in_(categories),
             ~Menu.menu_id.in_(ordered_menu_ids)
         )
         .all()
@@ -130,7 +115,6 @@ def get_recommendations(
     result = []
 
     for menu in recommended_menus:
-
         result.append({
             "menu_id": menu.menu_id,
             "food_name": menu.food_name,
