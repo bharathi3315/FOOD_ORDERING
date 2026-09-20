@@ -3,4 +3,4 @@ uvicorn
 sqlalchemy
 pymysql
 python-dotenv
-streamlit
+psycopg2-binary
