@@ -1,3 +1,4 @@
+
 import streamlit as st
 import requests
 
@@ -10,7 +11,7 @@ st.set_page_config(
 
 st.title("🍔 Food Ordering and Delivery Platform")
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://food-ordering-g7d5.onrender.com"
 
 
 # ---------------- LOGIN ----------------
@@ -44,10 +45,6 @@ if st.button("Login"):
                 st.success("Login successful!")
                 st.write("Welcome,", data["name"])
 
-            elif response.status_code == 404:
-
-                st.error("Customer not found")
-
             elif response.status_code == 401:
 
                 st.error("Invalid email or password")
@@ -62,7 +59,7 @@ if st.button("Login"):
 
         except requests.exceptions.ConnectionError:
 
-            st.error("FastAPI backend is not running")
+            st.error("Unable to connect to FastAPI backend")
 
     else:
 
@@ -117,6 +114,8 @@ try:
                             params={
                                 "customer_id": customer_id,
                                 "restaurant_id": item["restaurant_id"],
+                                "menu_id": item["menu_id"],
+                                "quantity": quantity,
                                 "total_amount": item["price"] * quantity
                             }
                         )
@@ -158,7 +157,7 @@ try:
 
 except requests.exceptions.ConnectionError:
 
-    st.error("FastAPI backend is not running")
+    st.error("Unable to connect to FastAPI backend")
 
 
 # ---------------- ORDER HISTORY ----------------
@@ -221,7 +220,7 @@ if customer_id:
 
     except requests.exceptions.ConnectionError:
 
-        st.error("FastAPI backend is not running")
+        st.error("Unable to connect to FastAPI backend")
 
 else:
 
@@ -281,7 +280,9 @@ if customer_id:
                             f"{BASE_URL}/orders/",
                             params={
                                 "customer_id": customer_id,
-                                "restaurant_id": 1,
+                                "restaurant_id": item["restaurant_id"],
+                                "menu_id": item["menu_id"],
+                                "quantity": 1,
                                 "total_amount": item["price"]
                             }
                         )
@@ -324,7 +325,7 @@ if customer_id:
 
     except requests.exceptions.ConnectionError:
 
-        st.error("FastAPI backend is not running")
+        st.error("Unable to connect to FastAPI backend")
 
 else:
 
@@ -398,7 +399,7 @@ if st.button("Check Delivery Status"):
 
     except requests.exceptions.ConnectionError:
 
-        st.error("FastAPI backend is not running")
+        st.error("Unable to connect to FastAPI backend")
 
 
 # ---------------- PAYMENT ----------------
@@ -408,14 +409,14 @@ st.subheader("💳 Payment")
 payment_order_id = st.number_input(
     "Payment Order ID",
     min_value=1,
-    value=6,
+    value=2,
     step=1
 )
 
 payment_amount = st.number_input(
     "Amount",
     min_value=1,
-    value=200,
+    value=150,
     step=1
 )
 
@@ -501,5 +502,6 @@ if st.button("💳 Make Payment"):
         except requests.exceptions.ConnectionError:
 
             st.error(
-                "FastAPI backend is not running"
+                "Unable to connect to FastAPI backend"
             )
+```
