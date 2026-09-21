@@ -11,62 +11,207 @@ st.title("🍔 Food Ordering and Delivery Platform")
 BASE_URL = "https://food-ordering-g7d5.onrender.com"
 
 
-# ---------------- LOGIN ----------------
+# =========================================================
+# SIGNUP / LOGIN
+# =========================================================
 
-st.subheader("🔐 Login")
+st.subheader("🔐 Account")
 
-email = st.text_input("Email")
-password = st.text_input("Password", type="password")
+account_type = st.radio(
+    "Choose an option",
+    ["Login", "Sign Up"],
+    horizontal=True
+)
 
-if st.button("Login"):
 
-    if email and password:
+# =========================================================
+# SIGN UP
+# =========================================================
 
-        try:
-            response = requests.post(
-                f"{BASE_URL}/customers/login",
-                params={
-                    "email": email,
-                    "password": password
-                }
-            )
+if account_type == "Sign Up":
 
-            if response.status_code == 200:
+    st.write("### 📝 Create New Account")
 
-                data = response.json()
+    signup_name = st.text_input(
+        "Name",
+        key="signup_name"
+    )
 
-                st.session_state["customer_id"] = data["customer_id"]
-                st.session_state["customer_name"] = data["name"]
-                st.session_state["customer_email"] = data["email"]
+    signup_email = st.text_input(
+        "Email",
+        key="signup_email"
+    )
 
-                st.success("Login successful!")
-                st.write("Welcome,", data["name"])
+    signup_phone = st.text_input(
+        "Phone",
+        key="signup_phone"
+    )
 
-            elif response.status_code == 401:
+    signup_address = st.text_input(
+        "Address",
+        key="signup_address"
+    )
 
-                st.error("Invalid email or password")
+    signup_password = st.text_input(
+        "Password",
+        type="password",
+        key="signup_password"
+    )
 
-            else:
+    if st.button("📝 Sign Up"):
 
-                st.error(
-                    f"Login failed - Status Code: {response.status_code}"
+        if (
+            signup_name
+            and signup_email
+            and signup_phone
+            and signup_address
+            and signup_password
+        ):
+
+            try:
+
+                response = requests.post(
+                    f"{BASE_URL}/customers/register",
+                    params={
+                        "name": signup_name,
+                        "email": signup_email,
+                        "phone": signup_phone,
+                        "address": signup_address,
+                        "password": signup_password
+                    }
                 )
 
-                st.code(response.text)
+                if response.status_code == 200:
 
-        except requests.exceptions.ConnectionError:
+                    st.success(
+                        "✅ Registration successful!"
+                    )
 
-            st.error("Unable to connect to FastAPI backend")
+                    st.info(
+                        "Now select Login and login with your email and password."
+                    )
 
-    else:
+                elif response.status_code == 400:
 
-        st.warning("Please enter Email and Password")
+                    st.error(
+                        "❌ Email already registered."
+                    )
+
+                else:
+
+                    st.error(
+                        f"Registration failed - "
+                        f"Status Code: {response.status_code}"
+                    )
+
+                    st.code(response.text)
+
+            except requests.exceptions.ConnectionError:
+
+                st.error(
+                    "Unable to connect to FastAPI backend"
+                )
+
+        else:
+
+            st.warning(
+                "⚠️ Please fill all the details."
+            )
+
+
+# =========================================================
+# LOGIN
+# =========================================================
+
+else:
+
+    st.write("### 🔑 Login")
+
+    email = st.text_input(
+        "Email",
+        key="login_email"
+    )
+
+    password = st.text_input(
+        "Password",
+        type="password",
+        key="login_password"
+    )
+
+    if st.button("Login"):
+
+        if email and password:
+
+            try:
+
+                response = requests.post(
+                    f"{BASE_URL}/customers/login",
+                    params={
+                        "email": email,
+                        "password": password
+                    }
+                )
+
+                if response.status_code == 200:
+
+                    data = response.json()
+
+                    st.session_state["customer_id"] = (
+                        data["customer_id"]
+                    )
+
+                    st.session_state["customer_name"] = (
+                        data["name"]
+                    )
+
+                    st.session_state["customer_email"] = (
+                        data["email"]
+                    )
+
+                    st.success(
+                        "✅ Login successful!"
+                    )
+
+                    st.write(
+                        "Welcome,",
+                        data["name"]
+                    )
+
+                elif response.status_code == 401:
+
+                    st.error(
+                        "❌ Invalid email or password"
+                    )
+
+                else:
+
+                    st.error(
+                        f"Login failed - "
+                        f"Status Code: "
+                        f"{response.status_code}"
+                    )
+
+                    st.code(response.text)
+
+            except requests.exceptions.ConnectionError:
+
+                st.error(
+                    "Unable to connect to FastAPI backend"
+                )
+
+        else:
+
+            st.warning(
+                "Please enter Email and Password"
+            )
 
 
 customer_id = st.session_state.get("customer_id")
 
 
-# ---------------- FOOD MENU ----------------
+# =========================================================
+# FOOD MENU
+# =========================================================
 
 st.subheader("🍴 Food Menu")
 
@@ -84,9 +229,20 @@ try:
 
             for item in menus:
 
-                st.write("🍽️ Food:", item["food_name"])
-                st.write("💰 Price:", item["price"])
-                st.write("📂 Category:", item["category"])
+                st.write(
+                    "🍽️ Food:",
+                    item["food_name"]
+                )
+
+                st.write(
+                    "💰 Price:",
+                    item["price"]
+                )
+
+                st.write(
+                    "📂 Category:",
+                    item["category"]
+                )
 
                 quantity = st.number_input(
                     "Quantity",
@@ -102,7 +258,9 @@ try:
 
                     if not customer_id:
 
-                        st.warning("Please login first")
+                        st.warning(
+                            "Please login first"
+                        )
 
                     else:
 
@@ -113,16 +271,20 @@ try:
                                 "restaurant_id": item["restaurant_id"],
                                 "menu_id": item["menu_id"],
                                 "quantity": quantity,
-                                "total_amount": item["price"] * quantity
+                                "total_amount": (
+                                    item["price"] * quantity
+                                )
                             }
                         )
 
                         if order_response.status_code == 200:
 
-                            order_data = order_response.json()
+                            order_data = (
+                                order_response.json()
+                            )
 
                             st.success(
-                                "Order created successfully!"
+                                "✅ Order created successfully!"
                             )
 
                             st.write(
@@ -134,30 +296,40 @@ try:
 
                             st.error(
                                 f"Unable to create order - "
-                                f"Status Code: {order_response.status_code}"
+                                f"Status Code: "
+                                f"{order_response.status_code}"
                             )
 
-                            st.code(order_response.text)
+                            st.code(
+                                order_response.text
+                            )
 
                 st.divider()
 
         else:
 
-            st.info("No food items available")
+            st.info(
+                "No food items available"
+            )
 
     else:
 
         st.error(
             f"Unable to load food menu - "
-            f"Status Code: {response.status_code}"
+            f"Status Code: "
+            f"{response.status_code}"
         )
 
 except requests.exceptions.ConnectionError:
 
-    st.error("Unable to connect to FastAPI backend")
+    st.error(
+        "Unable to connect to FastAPI backend"
+    )
 
 
-# ---------------- ORDER HISTORY ----------------
+# =========================================================
+# ORDER HISTORY
+# =========================================================
 
 st.subheader("📜 My Order History")
 
@@ -166,7 +338,8 @@ if customer_id:
     try:
 
         history_response = requests.get(
-            f"{BASE_URL}/orders/customer/{customer_id}/history"
+            f"{BASE_URL}/orders/customer/"
+            f"{customer_id}/history"
         )
 
         if history_response.status_code == 200:
@@ -177,35 +350,63 @@ if customer_id:
 
                 for order in history:
 
-                    st.write("🧾 Order ID:", order["order_id"])
-                    st.write("🍽️ Food:", order["food_name"])
-                    st.write("🔢 Quantity:", order["quantity"])
-                    st.write("💰 Price:", order["price"])
-                    st.write("📌 Status:", order["status"])
+                    st.write(
+                        "🧾 Order ID:",
+                        order["order_id"]
+                    )
+
+                    st.write(
+                        "🍽️ Food:",
+                        order["food_name"]
+                    )
+
+                    st.write(
+                        "🔢 Quantity:",
+                        order["quantity"]
+                    )
+
+                    st.write(
+                        "💰 Price:",
+                        order["price"]
+                    )
+
+                    st.write(
+                        "📌 Status:",
+                        order["status"]
+                    )
 
                     st.divider()
 
             else:
 
-                st.info("No order history found")
+                st.info(
+                    "No order history found"
+                )
 
         else:
 
             st.error(
                 f"Unable to load order history - "
-                f"Status Code: {history_response.status_code}"
+                f"Status Code: "
+                f"{history_response.status_code}"
             )
 
     except requests.exceptions.ConnectionError:
 
-        st.error("Unable to connect to FastAPI backend")
+        st.error(
+            "Unable to connect to FastAPI backend"
+        )
 
 else:
 
-    st.info("Please login to view your order history")
+    st.info(
+        "Please login to view your order history"
+    )
 
 
-# ---------------- RECOMMENDATIONS ----------------
+# =========================================================
+# RECOMMENDATIONS
+# =========================================================
 
 st.subheader("⭐ Recommended For You")
 
@@ -217,28 +418,39 @@ if customer_id:
             f"{BASE_URL}/recommendations/{customer_id}"
         )
 
-        st.write("Customer ID:", customer_id)
-
-        st.write(
-            "Recommendation API:",
-            recommendation_response.status_code,
-            recommendation_response.text
-        )
-
         if recommendation_response.status_code == 200:
 
-            recommendations = recommendation_response.json()
+            recommendations = (
+                recommendation_response.json()
+            )
 
             if recommendations:
 
-                st.success("🍽️ Recommended Food For You")
+                st.success(
+                    "🍽️ Recommended Food For You"
+                )
 
                 for item in recommendations:
 
-                    st.write("🍴 Food:", item["food_name"])
-                    st.write("💰 Price:", item["price"])
-                    st.write("📂 Category:", item["category"])
-                    st.write("⭐ Score:", item["score"])
+                    st.write(
+                        "🍴 Food:",
+                        item["food_name"]
+                    )
+
+                    st.write(
+                        "💰 Price:",
+                        item["price"]
+                    )
+
+                    st.write(
+                        "📂 Category:",
+                        item["category"]
+                    )
+
+                    st.write(
+                        "⭐ Score:",
+                        item["score"]
+                    )
 
                     if st.button(
                         "🛒 Order Recommended Food",
@@ -258,10 +470,13 @@ if customer_id:
 
                         if order_response.status_code == 200:
 
-                            order_data = order_response.json()
+                            order_data = (
+                                order_response.json()
+                            )
 
                             st.success(
-                                "Recommended food ordered successfully!"
+                                "✅ Recommended food "
+                                "ordered successfully!"
                             )
 
                             st.write(
@@ -272,10 +487,13 @@ if customer_id:
                         else:
 
                             st.error(
-                                "Unable to order recommended food"
+                                "Unable to order "
+                                "recommended food"
                             )
 
-                            st.code(order_response.text)
+                            st.code(
+                                order_response.text
+                            )
 
                     st.divider()
 
@@ -289,7 +507,8 @@ if customer_id:
 
             st.error(
                 f"Recommendation API failed - "
-                f"Status Code: {recommendation_response.status_code}"
+                f"Status Code: "
+                f"{recommendation_response.status_code}"
             )
 
             st.code(
@@ -307,7 +526,11 @@ else:
     st.info(
         "Please login to view personalized recommendations."
     )
-    # ---------------- DELIVERY TRACKING ----------------
+
+
+# =========================================================
+# DELIVERY TRACKING
+# =========================================================
 
 st.subheader("🚚 Delivery Tracking")
 
@@ -325,14 +548,19 @@ if customer_id:
         try:
 
             tracking_response = requests.get(
-                f"{BASE_URL}/deliveries/order/{tracking_order_id}"
+                f"{BASE_URL}/deliveries/order/"
+                f"{tracking_order_id}"
             )
 
             if tracking_response.status_code == 200:
 
-                tracking_data = tracking_response.json()
+                tracking_data = (
+                    tracking_response.json()
+                )
 
-                st.success("Delivery information found")
+                st.success(
+                    "✅ Delivery information found"
+                )
 
                 st.write(
                     "📦 Order ID:",
@@ -346,7 +574,9 @@ if customer_id:
 
                 st.write(
                     "👤 Delivery Partner:",
-                    tracking_data.get("delivery_partner_name")
+                    tracking_data.get(
+                        "delivery_partner_name"
+                    )
                 )
 
                 st.write(
@@ -356,13 +586,16 @@ if customer_id:
 
             elif tracking_response.status_code == 404:
 
-                st.warning("Delivery not found")
+                st.warning(
+                    "Delivery not found"
+                )
 
             else:
 
                 st.error(
                     f"Unable to track delivery - "
-                    f"Status Code: {tracking_response.status_code}"
+                    f"Status Code: "
+                    f"{tracking_response.status_code}"
                 )
 
         except requests.exceptions.ConnectionError:
@@ -378,7 +611,9 @@ else:
     )
 
 
-# ---------------- PAYMENT ----------------
+# =========================================================
+# PAYMENT
+# =========================================================
 
 st.subheader("💳 Payment")
 
@@ -413,7 +648,9 @@ if customer_id:
 
         if not transaction_id:
 
-            st.warning("Please enter Transaction ID")
+            st.warning(
+                "Please enter Transaction ID"
+            )
 
         else:
 
@@ -431,9 +668,13 @@ if customer_id:
 
                 if payment_response.status_code == 200:
 
-                    payment_data = payment_response.json()
+                    payment_data = (
+                        payment_response.json()
+                    )
 
-                    st.success("✅ Payment successful!")
+                    st.success(
+                        "✅ Payment successful!"
+                    )
 
                     st.write(
                         "Payment ID:",
@@ -452,27 +693,36 @@ if customer_id:
 
                     st.write(
                         "Payment Method:",
-                        payment_data.get("payment_method")
+                        payment_data.get(
+                            "payment_method"
+                        )
                     )
 
                     st.write(
                         "Transaction ID:",
-                        payment_data.get("transaction_id")
+                        payment_data.get(
+                            "transaction_id"
+                        )
                     )
 
                     st.write(
                         "Status:",
-                        payment_data.get("status")
+                        payment_data.get(
+                            "payment_status"
+                        )
                     )
 
                 else:
 
                     st.error(
                         f"Payment failed - "
-                        f"Status Code: {payment_response.status_code}"
+                        f"Status Code: "
+                        f"{payment_response.status_code}"
                     )
 
-                    st.code(payment_response.text)
+                    st.code(
+                        payment_response.text
+                    )
 
             except requests.exceptions.ConnectionError:
 
@@ -485,5 +735,3 @@ else:
     st.info(
         "Please login to make payment."
     )
-
-
