@@ -52,7 +52,34 @@ def create_delivery(
     }
 
 
-# ---------------- GET DELIVERY ----------------
+# ---------------- GET DELIVERY BY ORDER ID ----------------
+
+@router.get("/order/{order_id}")
+def get_delivery_by_order(
+    order_id: int,
+    db: Session = Depends(get_db)
+):
+
+    delivery = db.query(Delivery).filter(
+        Delivery.order_id == order_id
+    ).first()
+
+    if not delivery:
+        raise HTTPException(
+            status_code=404,
+            detail="Delivery not found"
+        )
+
+    return {
+        "delivery_id": delivery.delivery_id,
+        "order_id": delivery.order_id,
+        "delivery_partner_name": delivery.delivery_partner_name,
+        "phone": delivery.phone,
+        "status": delivery.status
+    }
+
+
+# ---------------- GET DELIVERY BY DELIVERY ID ----------------
 
 @router.get("/{delivery_id}")
 def get_delivery(

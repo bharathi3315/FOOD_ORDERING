@@ -1,8 +1,5 @@
-
 import streamlit as st
 import requests
-
-# ---------------- PAGE SETTINGS ----------------
 
 st.set_page_config(
     page_title="Food Ordering Platform",
@@ -180,30 +177,11 @@ if customer_id:
 
                 for order in history:
 
-                    st.write(
-                        "🧾 Order ID:",
-                        order["order_id"]
-                    )
-
-                    st.write(
-                        "🍽️ Food:",
-                        order["food_name"]
-                    )
-
-                    st.write(
-                        "🔢 Quantity:",
-                        order["quantity"]
-                    )
-
-                    st.write(
-                        "💰 Price:",
-                        order["price"]
-                    )
-
-                    st.write(
-                        "📌 Status:",
-                        order["status"]
-                    )
+                    st.write("🧾 Order ID:", order["order_id"])
+                    st.write("🍽️ Food:", order["food_name"])
+                    st.write("🔢 Quantity:", order["quantity"])
+                    st.write("💰 Price:", order["price"])
+                    st.write("📌 Status:", order["status"])
 
                     st.divider()
 
@@ -239,37 +217,28 @@ if customer_id:
             f"{BASE_URL}/recommendations/{customer_id}"
         )
 
+        st.write("Customer ID:", customer_id)
+
+        st.write(
+            "Recommendation API:",
+            recommendation_response.status_code,
+            recommendation_response.text
+        )
+
         if recommendation_response.status_code == 200:
 
             recommendations = recommendation_response.json()
 
             if recommendations:
 
-                st.write(
-                    "🍽️ Based on your previous orders:"
-                )
+                st.success("🍽️ Recommended Food For You")
 
                 for item in recommendations:
 
-                    st.write(
-                        "🍴 Food:",
-                        item["food_name"]
-                    )
-
-                    st.write(
-                        "💰 Price:",
-                        item["price"]
-                    )
-
-                    st.write(
-                        "📂 Category:",
-                        item["category"]
-                    )
-
-                    st.write(
-                        "⭐ Recommendation Score:",
-                        item["score"]
-                    )
+                    st.write("🍴 Food:", item["food_name"])
+                    st.write("💰 Price:", item["price"])
+                    st.write("📂 Category:", item["category"])
+                    st.write("⭐ Score:", item["score"])
 
                     if st.button(
                         "🛒 Order Recommended Food",
@@ -312,25 +281,31 @@ if customer_id:
 
             else:
 
-                st.info(
+                st.warning(
                     "No recommendations available yet."
                 )
 
         else:
 
             st.error(
-                f"Unable to load recommendations - "
+                f"Recommendation API failed - "
                 f"Status Code: {recommendation_response.status_code}"
+            )
+
+            st.code(
+                recommendation_response.text
             )
 
     except requests.exceptions.ConnectionError:
 
-        st.error("Unable to connect to FastAPI backend")
+        st.error(
+            "Unable to connect to FastAPI backend"
+        )
 
 else:
 
     st.info(
-        "Please login to view recommendations"
+        "Please login to view personalized recommendations."
     )
 
 
@@ -338,170 +313,168 @@ else:
 
 st.subheader("🚚 Delivery Tracking")
 
-delivery_id = st.number_input(
-    "Delivery ID",
-    min_value=1,
-    value=1,
-    step=1
-)
+if customer_id:
 
-if st.button("Check Delivery Status"):
+    tracking_order_id = st.number_input(
+        "Enter Order ID",
+        min_value=1,
+        step=1
+    )
 
-    try:
-
-        delivery_response = requests.get(
-            f"{BASE_URL}/deliveries/{delivery_id}"
-        )
-
-        if delivery_response.status_code == 200:
-
-            delivery_data = delivery_response.json()
-
-            st.success(
-                "Delivery information loaded"
-            )
-
-            st.write(
-                "🚚 Delivery ID:",
-                delivery_data["delivery_id"]
-            )
-
-            st.write(
-                "📦 Order ID:",
-                delivery_data["order_id"]
-            )
-
-            st.write(
-                "👨‍💼 Delivery Partner:",
-                delivery_data["delivery_partner_name"]
-            )
-
-            st.write(
-                "📱 Phone:",
-                delivery_data["phone"]
-            )
-
-            st.write(
-                "📌 Status:",
-                delivery_data["status"]
-            )
-
-        elif delivery_response.status_code == 404:
-
-            st.error("Delivery not found")
-
-        else:
-
-            st.error(
-                f"Unable to get delivery status - "
-                f"Status Code: {delivery_response.status_code}"
-            )
-
-    except requests.exceptions.ConnectionError:
-
-        st.error("Unable to connect to FastAPI backend")
-
-
-# ---------------- PAYMENT ----------------
-
-st.subheader("💳 Payment")
-
-payment_order_id = st.number_input(
-    "Payment Order ID",
-    min_value=1,
-    value=2,
-    step=1
-)
-
-payment_amount = st.number_input(
-    "Amount",
-    min_value=1,
-    value=150,
-    step=1
-)
-
-payment_method = st.selectbox(
-    "Payment Method",
-    ["UPI", "Cash", "Card"]
-)
-
-transaction_id = st.text_input(
-    "Transaction ID"
-)
-
-if st.button("💳 Make Payment"):
-
-    if not transaction_id:
-
-        st.warning(
-            "Please enter Transaction ID"
-        )
-
-    else:
+    if st.button("Track Order"):
 
         try:
 
-            payment_response = requests.post(
-                f"{BASE_URL}/payments/",
-                params={
-                    "order_id": payment_order_id,
-                    "payment_method": payment_method,
-                    "amount": payment_amount,
-                    "transaction_id": transaction_id
-                }
+            tracking_response = requests.get(
+                f"{BASE_URL}/delivery/{tracking_order_id}"
             )
 
-            if payment_response.status_code == 200:
+            if tracking_response.status_code == 200:
 
-                payment_data = payment_response.json()
+                tracking_data = tracking_response.json()
 
-                st.success(
-                    "Payment successful!"
+                st.success("Delivery information found")
+
+                st.write(
+                    "📦 Order ID:",
+                    tracking_data.get("order_id")
                 )
 
                 st.write(
-                    "Payment ID:",
-                    payment_data["payment_id"]
+                    "🚚 Status:",
+                    tracking_data.get("status")
                 )
 
                 st.write(
-                    "Order ID:",
-                    payment_data["order_id"]
+                    "📍 Location:",
+                    tracking_data.get("location")
                 )
 
-                st.write(
-                    "Amount:",
-                    payment_data["amount"]
-                )
+            elif tracking_response.status_code == 404:
 
-                st.write(
-                    "Payment Status:",
-                    payment_data["payment_status"]
-                )
-
-                st.write(
-                    "Transaction ID:",
-                    payment_data["transaction_id"]
-                )
-
-            elif payment_response.status_code == 404:
-
-                st.error(
-                    "Order not found"
-                )
+                st.warning("Delivery not found")
 
             else:
 
                 st.error(
-                    f"Payment failed - "
-                    f"Status Code: {payment_response.status_code}"
+                    f"Unable to track delivery - "
+                    f"Status Code: {tracking_response.status_code}"
                 )
-
-                st.code(payment_response.text)
 
         except requests.exceptions.ConnectionError:
 
             st.error(
                 "Unable to connect to FastAPI backend"
             )
-```
+
+else:
+
+    st.info(
+        "Please login to track your delivery."
+    )
+    # ---------------- PAYMENT ----------------
+
+st.subheader("💳 Payment")
+
+if customer_id:
+
+    payment_order_id = st.number_input(
+        "Enter Order ID for Payment",
+        min_value=1,
+        step=1,
+        key="payment_order"
+    )
+
+    payment_amount = st.number_input(
+        "Payment Amount",
+        min_value=1,
+        step=1
+    )
+
+    payment_method = st.selectbox(
+        "Payment Method",
+        ["UPI", "Card", "Cash"]
+    )
+
+    transaction_id = st.text_input(
+        "Transaction ID"
+    )
+
+    if st.button("💰 Pay Now"):
+
+        if not transaction_id:
+
+            st.warning("Please enter Transaction ID")
+
+        else:
+
+            try:
+
+                payment_response = requests.post(
+                    f"{BASE_URL}/payments/",
+                    params={
+                        "order_id": payment_order_id,
+                        "amount": payment_amount,
+                        "payment_method": payment_method,
+                        "transaction_id": transaction_id
+                    }
+                )
+
+                if payment_response.status_code == 200:
+
+                    payment_data = payment_response.json()
+
+                    st.success("✅ Payment successful!")
+
+                    st.write(
+                        "Payment ID:",
+                        payment_data.get("payment_id")
+                    )
+
+                    st.write(
+                        "Order ID:",
+                        payment_data.get("order_id")
+                    )
+
+                    st.write(
+                        "Amount:",
+                        payment_data.get("amount")
+                    )
+
+                    st.write(
+                        "Payment Method:",
+                        payment_data.get("payment_method")
+                    )
+
+                    st.write(
+                        "Transaction ID:",
+                        payment_data.get("transaction_id")
+                    )
+
+                    st.write(
+                        "Status:",
+                        payment_data.get("status")
+                    )
+
+                else:
+
+                    st.error(
+                        f"Payment failed - "
+                        f"Status Code: {payment_response.status_code}"
+                    )
+
+                    st.code(payment_response.text)
+
+            except requests.exceptions.ConnectionError:
+
+                st.error(
+                    "Unable to connect to FastAPI backend"
+                )
+
+else:
+
+    st.info(
+        "Please login to make payment."
+    )
+
+
