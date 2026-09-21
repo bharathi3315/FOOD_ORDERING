@@ -307,9 +307,7 @@ else:
     st.info(
         "Please login to view personalized recommendations."
     )
-
-
-# ---------------- DELIVERY TRACKING ----------------
+    # ---------------- DELIVERY TRACKING ----------------
 
 st.subheader("🚚 Delivery Tracking")
 
@@ -318,7 +316,8 @@ if customer_id:
     tracking_order_id = st.number_input(
         "Enter Order ID",
         min_value=1,
-        step=1
+        step=1,
+        key="tracking_order"
     )
 
     if st.button("Track Order"):
@@ -326,7 +325,7 @@ if customer_id:
         try:
 
             tracking_response = requests.get(
-                f"{BASE_URL}/delivery/{tracking_order_id}"
+                f"{BASE_URL}/deliveries/order/{tracking_order_id}"
             )
 
             if tracking_response.status_code == 200:
@@ -346,8 +345,13 @@ if customer_id:
                 )
 
                 st.write(
-                    "📍 Location:",
-                    tracking_data.get("location")
+                    "👤 Delivery Partner:",
+                    tracking_data.get("delivery_partner_name")
+                )
+
+                st.write(
+                    "📞 Phone:",
+                    tracking_data.get("phone")
                 )
 
             elif tracking_response.status_code == 404:
@@ -372,7 +376,9 @@ else:
     st.info(
         "Please login to track your delivery."
     )
-    # ---------------- PAYMENT ----------------
+
+
+# ---------------- PAYMENT ----------------
 
 st.subheader("💳 Payment")
 
@@ -388,16 +394,19 @@ if customer_id:
     payment_amount = st.number_input(
         "Payment Amount",
         min_value=1,
-        step=1
+        step=1,
+        key="payment_amount"
     )
 
     payment_method = st.selectbox(
         "Payment Method",
-        ["UPI", "Card", "Cash"]
+        ["UPI", "Card", "Cash"],
+        key="payment_method"
     )
 
     transaction_id = st.text_input(
-        "Transaction ID"
+        "Transaction ID",
+        key="transaction_id"
     )
 
     if st.button("💰 Pay Now"):
