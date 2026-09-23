@@ -11,10 +11,6 @@ st.title("🍔 Food Ordering and Delivery Platform")
 BASE_URL = "https://food-ordering-g7d5.onrender.com"
 
 
-# =========================================================
-# SIGNUP / LOGIN
-# =========================================================
-
 st.subheader("🔐 Account")
 
 account_type = st.radio(
@@ -207,13 +203,27 @@ else:
 
 
 customer_id = st.session_state.get("customer_id")
+# NAVIGATION
+if customer_id:
+    st.subheader("📌 Navigation")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("🛒 Order Food"):
+            st.session_state["page"] = "order"
+
+    with col2:
+        if st.button("📜 My Orders"):
+            st.session_state["page"] = "orders"
 
 
 # =========================================================
 # FOOD MENU
 # =========================================================
-
-st.subheader("🍴 Food Menu")
+if st.session_state.get("page") == "order":
+    # FOOD MENU
+    st.subheader("🍴 Food Menu")
 
 try:
 
@@ -330,78 +340,41 @@ except requests.exceptions.ConnectionError:
 # =========================================================
 # ORDER HISTORY
 # =========================================================
+if st.session_state.get("page") == "orders":
+    st.subheader("📜 My Order History")
 
-st.subheader("📜 My Order History")
-
-if customer_id:
-
-    try:
-
-        history_response = requests.get(
-            f"{BASE_URL}/orders/customer/"
-            f"{customer_id}/history"
-        )
-
-        if history_response.status_code == 200:
-
-            history = history_response.json()
-
-            if history:
-
-                for order in history:
-
-                    st.write(
-                        "🧾 Order ID:",
-                        order["order_id"]
-                    )
-
-                    st.write(
-                        "🍽️ Food:",
-                        order["food_name"]
-                    )
-
-                    st.write(
-                        "🔢 Quantity:",
-                        order["quantity"]
-                    )
-
-                    st.write(
-                        "💰 Price:",
-                        order["price"]
-                    )
-
-                    st.write(
-                        "📌 Status:",
-                        order["status"]
-                    )
-
-                    st.divider()
-
-            else:
-
-                st.info(
-                    "No order history found"
-                )
-
-        else:
-
-            st.error(
-                f"Unable to load order history - "
-                f"Status Code: "
-                f"{history_response.status_code}"
+    if customer_id:
+        try:
+            history_response = requests.get(
+                f"{BASE_URL}/orders/customer/"
+                f"{customer_id}/history"
             )
 
-    except requests.exceptions.ConnectionError:
+            if history_response.status_code == 200:
+                history = history_response.json()
 
-        st.error(
-            "Unable to connect to FastAPI backend"
-        )
+                if history:
+                    for order in history:
+                        st.write("🧾 Order ID:", order["order_id"])
+                        st.write("🍽️ Food:", order["food_name"])
+                        st.write("🔢 Quantity:", order["quantity"])
+                        st.write("💰 Price:", order["price"])
+                        st.write("📌 Status:", order["status"])
+                        st.divider()
+                else:
+                    st.info("No order history found")
 
-else:
+            else:
+                st.error(
+                    f"Unable to load order history - "
+                    f"Status Code: {history_response.status_code}"
+                )
 
-    st.info(
-        "Please login to view your order history"
-    )
+        except requests.exceptions.ConnectionError:
+            st.error("Unable to connect to FastAPI backend")
+
+    else:
+        st.info("Please login to view your order history")
 
 
 # =========================================================
