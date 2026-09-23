@@ -216,6 +216,8 @@ if customer_id:
     with col2:
         if st.button("📜 My Orders"):
             st.session_state["page"] = "orders"
+if "page" not in st.session_state:
+    st.session_state["page"] = "order"
 
 
 # =========================================================
