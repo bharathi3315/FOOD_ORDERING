@@ -121,86 +121,105 @@ if account_type == "Sign Up":
 
 else:
 
-    st.write("### 🔑 Login")
+    # Clean login page - Streamlit/Python only (no HTML)
+    st.write("")
+    st.write("")
 
-    email = st.text_input(
-        "Email",
-        key="login_email"
-    )
+    left, center, right = st.columns([1, 2, 1])
 
-    password = st.text_input(
-        "Password",
-        type="password",
-        key="login_password"
-    )
+    with center:
+        with st.container(border=True):
+            st.markdown("### 🍔 Food Ordering")
+            st.title("Welcome Back!")
+            st.write("🔐 Login to your account")
 
-    if st.button("Login"):
+            email = st.text_input(
+                "📧 Email",
+                placeholder="Enter your email",
+                key="login_email"
+            )
 
-        if email and password:
+            password = st.text_input(
+                "🔒 Password",
+                placeholder="Enter your password",
+                type="password",
+                key="login_password"
+            )
 
-            try:
+            st.write("")
 
-                response = requests.post(
-                    f"{BASE_URL}/customers/login",
-                    params={
-                        "email": email,
-                        "password": password
-                    }
-                )
+            if st.button(
+                "🍔  Login",
+                use_container_width=True,
+                type="primary"
+            ):
 
-                if response.status_code == 200:
+                if email and password:
 
-                    data = response.json()
+                    try:
 
-                    st.session_state["customer_id"] = (
-                        data["customer_id"]
-                    )
+                        response = requests.post(
+                            f"{BASE_URL}/customers/login",
+                            params={
+                                "email": email,
+                                "password": password
+                            }
+                        )
 
-                    st.session_state["customer_name"] = (
-                        data["name"]
-                    )
+                        if response.status_code == 200:
 
-                    st.session_state["customer_email"] = (
-                        data["email"]
-                    )
+                            data = response.json()
 
-                    st.success(
-                        "✅ Login successful!"
-                    )
+                            st.session_state["customer_id"] = (
+                                data["customer_id"]
+                            )
 
-                    st.write(
-                        "Welcome,",
-                        data["name"]
-                    )
+                            st.session_state["customer_name"] = (
+                                data["name"]
+                            )
 
-                elif response.status_code == 401:
+                            st.session_state["customer_email"] = (
+                                data["email"]
+                            )
 
-                    st.error(
-                        "❌ Invalid email or password"
-                    )
+                            st.success(
+                                "✅ Login successful!"
+                            )
+
+                            st.write(
+                                "Welcome,",
+                                data["name"]
+                            )
+
+                        elif response.status_code == 401:
+
+                            st.error(
+                                "❌ Invalid email or password"
+                            )
+
+                        else:
+
+                            st.error(
+                                f"Login failed - "
+                                f"Status Code: "
+                                f"{response.status_code}"
+                            )
+
+                            st.code(response.text)
+
+                    except requests.exceptions.ConnectionError:
+
+                        st.error(
+                            "Unable to connect to FastAPI backend"
+                        )
 
                 else:
 
-                    st.error(
-                        f"Login failed - "
-                        f"Status Code: "
-                        f"{response.status_code}"
+                    st.warning(
+                        "Please enter Email and Password"
                     )
 
-                    st.code(response.text)
-
-            except requests.exceptions.ConnectionError:
-
-                st.error(
-                    "Unable to connect to FastAPI backend"
-                )
-
-        else:
-
-            st.warning(
-                "Please enter Email and Password"
-            )
-
+        st.caption("🍴 Order food • Track delivery • Get recommendations")
 
 customer_id = st.session_state.get("customer_id")
 # NAVIGATION
@@ -218,13 +237,7 @@ if customer_id:
             st.session_state["page"] = "orders"
 if "page" not in st.session_state:
     st.session_state["page"] = "order"
-
-
-# =========================================================
-# FOOD MENU
-# =========================================================
 if st.session_state.get("page") == "order":
-    # FOOD MENU
     st.subheader("🍴 Food Menu")
 
 try:
@@ -232,7 +245,6 @@ try:
     response = requests.get(
         f"{BASE_URL}/menus/"
     )
-
     if response.status_code == 200:
 
         menus = response.json()
