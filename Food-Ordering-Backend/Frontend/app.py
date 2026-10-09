@@ -2,7 +2,7 @@
 import streamlit as st
 import requests
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://food-ordering-1-lwsv.onrender.com"
 
 st.set_page_config(
     page_title="Food Ordering and Delivery Platform",
