@@ -3,15 +3,25 @@ from fastapi import FastAPI
 from app.database import Base, engine
 from app import models
 
-from app.routes import customer, restaurant, menu, order, order_item
-from app.routes import customer, restaurant, menu, order, order_item, delivery
-from app.routes import customer, restaurant, menu, order, order_item, delivery, payment
-from app.routes import customer, restaurant, menu, order, order_item, delivery, payment, recommendation
+from app.routes import (
+    customer,
+    restaurant,
+    menu,
+    order,
+    order_item,
+    delivery,
+    payment,
+    recommendation
+)
+
+
 app = FastAPI(
     title="Food Ordering and Delivery Platform"
 )
 
+
 Base.metadata.create_all(bind=engine)
+
 
 app.include_router(customer.router)
 app.include_router(restaurant.router)

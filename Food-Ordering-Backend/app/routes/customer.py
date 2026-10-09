@@ -3,14 +3,13 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Customer
+from app.schemas import CustomerLogin
 
 router = APIRouter(
     prefix="/customers",
     tags=["Customer"]
 )
 
-
-# Register Customer
 @router.post("/register")
 def register_customer(
     name: str,
@@ -48,15 +47,17 @@ def register_customer(
     }
 
 
+# ==============================
 # Login Customer
+# ==============================
+
 @router.post("/login")
 def login_customer(
-    email: str,
-    password: str,
+    customer_data: CustomerLogin,
     db: Session = Depends(get_db)
 ):
     customer = db.query(Customer).filter(
-        Customer.email == email
+        Customer.email == customer_data.email
     ).first()
 
     if not customer:
@@ -65,7 +66,7 @@ def login_customer(
             detail="Invalid email or password"
         )
 
-    if customer.password != password:
+    if customer.password != customer_data.password:
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password"

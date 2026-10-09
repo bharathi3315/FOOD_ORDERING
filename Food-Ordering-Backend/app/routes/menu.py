@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Menu
+from app.schemas import MenuCreate, MenuResponse
 
 router = APIRouter(
     prefix="/menus",
@@ -10,34 +11,50 @@ router = APIRouter(
 )
 
 
-@router.get("/")
-def get_menus(db: Session = Depends(get_db)):
+# GET ALL MENU ITEMS
+@router.get("/", response_model=list[MenuResponse])
+def get_menus(
+    db: Session = Depends(get_db)
+):
     menus = db.query(Menu).all()
 
     return menus
 
 
-@router.post("/")
+# ADD MENU ITEM
+@router.post("/", response_model=MenuResponse)
 def add_menu(
-    restaurant_id: int,
-    food_name: str,
-    price: int,
-    category: str,
+    menu: MenuCreate,
     db: Session = Depends(get_db)
 ):
     new_menu = Menu(
-        restaurant_id=restaurant_id,
-        food_name=food_name,
-        price=price,
-        category=category
+        restaurant_id=menu.restaurant_id,
+        food_name=menu.food_name,
+        price=menu.price,
+        category=menu.category
     )
 
     db.add(new_menu)
     db.commit()
     db.refresh(new_menu)
 
-    return {
-        "message": "Food added successfully",
-        "menu_id": new_menu.menu_id,
-        "food_name": new_menu.food_name
-    }
+    return new_menu
+
+
+# GET MENU ITEM BY ID
+@router.get("/{menu_id}", response_model=MenuResponse)
+def get_menu(
+    menu_id: int,
+    db: Session = Depends(get_db)
+):
+    menu = db.query(Menu).filter(
+        Menu.menu_id == menu_id
+    ).first()
+
+    if not menu:
+        raise HTTPException(
+            status_code=404,
+            detail="Food item not found"
+        )
+
+    return menu

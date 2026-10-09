@@ -1,14 +1,10 @@
 from pydantic import BaseModel
-
-
 class CustomerCreate(BaseModel):
     name: str
     email: str
     phone: str
     address: str
     password: str
-
-
 class CustomerResponse(BaseModel):
     customer_id: int
     name: str
@@ -18,8 +14,6 @@ class CustomerResponse(BaseModel):
 
     class Config:
         from_attributes = True
-
-
 class CustomerLogin(BaseModel):
     email: str
     password: str
@@ -28,14 +22,26 @@ class RestaurantCreate(BaseModel):
     location: str
     phone: str
     rating: str
-
-
 class RestaurantResponse(BaseModel):
     restaurant_id: int
     restaurant_name: str
     location: str
     phone: str
     rating: str
+
+    class Config:
+        from_attributes = True
+class MenuCreate(BaseModel):
+    restaurant_id: int
+    food_name: str
+    price: int
+    category: str
+class MenuResponse(BaseModel):
+    menu_id: int
+    restaurant_id: int
+    food_name: str
+    price: int
+    category: str
 
     class Config:
         from_attributes = True

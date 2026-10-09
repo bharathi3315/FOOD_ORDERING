@@ -2,14 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Payment, Order
+from app.models import Payment
 
 router = APIRouter(
     prefix="/payments",
-    tags=["Payments"]
+    tags=["Payment"]
 )
 
 
+# CREATE PAYMENT
 @router.post("/")
 def create_payment(
     order_id: int,
@@ -18,16 +19,6 @@ def create_payment(
     transaction_id: str,
     db: Session = Depends(get_db)
 ):
-    order = db.query(Order).filter(
-        Order.order_id == order_id
-    ).first()
-
-    if not order:
-        raise HTTPException(
-            status_code=404,
-            detail="Order not found"
-        )
-
     new_payment = Payment(
         order_id=order_id,
         payment_method=payment_method,
@@ -43,9 +34,34 @@ def create_payment(
     return {
         "message": "Payment successful",
         "payment_id": new_payment.payment_id,
-        "order_id": new_payment.order_id,
-        "payment_method": new_payment.payment_method,
-        "amount": new_payment.amount,
-        "payment_status": new_payment.payment_status,
-        "transaction_id": new_payment.transaction_id
+        "status": new_payment.payment_status
     }
+
+
+# GET ALL PAYMENTS
+@router.get("/")
+def get_payments(
+    db: Session = Depends(get_db)
+):
+    payments = db.query(Payment).all()
+
+    return payments
+
+
+# GET PAYMENT BY ID
+@router.get("/{payment_id}")
+def get_payment(
+    payment_id: int,
+    db: Session = Depends(get_db)
+):
+    payment = db.query(Payment).filter(
+        Payment.payment_id == payment_id
+    ).first()
+
+    if not payment:
+        raise HTTPException(
+            status_code=404,
+            detail="Payment not found"
+        )
+
+    return payment
