@@ -57,3 +57,12 @@ Current Status: In Progress
  Testing and deployment – Pending
 
 Overall Status: The basic design and database structure of the Food Ordering and Delivery Platform have been completed, and the project is currently moving towards implementation and development.
+4. Deployment Details
+
+Deployment Platform: Render
+
+Frontend URL:
+https://food-ordering-1-lwsv.onrender.com
+
+Backend URL:
+https://food-ordering-g7d5.onrender.com
